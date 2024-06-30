@@ -3,6 +3,7 @@ services:
   appseed-app:
     container_name: appseed_app
     restart: always
+    env_file: .env
     build: .
     networks:
       - db_network
@@ -12,7 +13,7 @@ services:
     restart: always
     image: "nginx:latest"
     ports:
-      - "5085:5085"
+      - "85:85"
     volumes:
       - ./nginx:/etc/nginx/conf.d
     networks:
