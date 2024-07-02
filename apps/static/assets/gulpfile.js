@@ -1,7 +1,7 @@
 /*
 
 =========================================================
-* AppSeed - Simple SCSS compiler via Gulp
+* Leaffit - Simple SCSS compiler via Gulp
 =========================================================
 
 */
