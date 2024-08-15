@@ -6,9 +6,11 @@ from .models import RepMax
 
 class WendlerForm(forms.ModelForm):
     """Form for the image model"""
-    class Meta:
-        model = RepMax
-        fields = ('weight',)
-
     weight = forms.IntegerField()
+
+    class Meta:
+
+        fields = ('weight',)
+        model = RepMax
+
 

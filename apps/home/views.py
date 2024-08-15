@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-# Import necessary modules
+# Import necessary modules from Django and other libraries
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
@@ -9,61 +9,115 @@ from django.template import loader
 from django.urls import reverse
 from docx import settings
 
-# Import ReportLab modules for PDF generation
+# Import PDF generation libraries
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Table, TableStyle, Paragraph
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.styles import getSampleStyleSheet
 
-# Import python-docx for Word document generation
-from docx import *
+# Import Word document generation library
+from docx import Document
 from docx.shared import Inches
 
 # Import custom form
 from .forms import WendlerForm
-
 from reportlab.pdfgen import canvas
 import io
 
-# Global variable to store Wendler workout data
-global_wendler_list = {}
+# View for the dashboard page, requires login
+@login_required(login_url="/login/")
+def index(request):
+    context = {'segment': 'index'}
+    html_template = loader.get_template('home/dashboard.html')
+    return HttpResponse(html_template.render(context, request))
 
+# View for the Wendler 5/3/1 calculator
+def wendler_view(request):
+    if request.method == 'POST':
+        form = WendlerForm(request.POST)
+        if form.is_valid():
+            # Get the one rep max weight from the form
+            number = int(request.POST['weight'])
+            global global_wendler_list
 
-# Function to generate PDF view
+            # List of percentages for the Wendler 5/3/1 program
+            percentage_list = [0.40, 0.50, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
+
+            # Calculate weights for each percentage
+            calculated_dict = {}
+            for num in percentage_list:
+                calc_num = (number * num - 20) / 2
+                # Round to nearest 2.5 kg
+                if (calc_num % 2.5) < 1.25:
+                    calc_num = calc_num - (calc_num % 2.5)
+                else:
+                    calc_num = calc_num + 2.5 - (calc_num % 2.5)
+                # Replace negative values with zero
+                if calc_num < 0:
+                    calc_num = 0
+                calculated_dict[num] = calc_num
+
+            # Create a dictionary with the exercise plan for each week
+            exercise_dict = {
+                'Week 1': {'Set 1': str(calculated_dict[0.4]) + 'kgx5',
+                           'Set 2': str(calculated_dict[0.65]) + 'kgx5',
+                           'Set 3': str(calculated_dict[0.75]) + 'kgx5',
+                           'Set 4': str(calculated_dict[0.85]) + 'kgx5'},
+
+                'Week 2': {'Set 1': str(calculated_dict[0.4]) + 'kgx3',
+                           'Set 2': str(calculated_dict[0.7]) + 'kgx3',
+                           'Set 3': str(calculated_dict[0.8]) + 'kgx3',
+                           'Set 4': str(calculated_dict[0.9]) + 'kgx3'},
+
+                'Week 3': {'Set 1': str(calculated_dict[0.4]) + 'kgx5',
+                           'Set 2': str(calculated_dict[0.75]) + 'kgx5',
+                           'Set 3': str(calculated_dict[0.85]) + 'kgx3',
+                           'Set 4': str(calculated_dict[0.95]) + 'kgx1'},
+
+                'Week 4': {'Set 1': str(calculated_dict[0.4]) + 'kgx5',
+                           'Set 2': str(calculated_dict[0.4]) + 'kgx5',
+                           'Set 3': str(calculated_dict[0.5]) + 'kgx5',
+                           'Set 4': str(calculated_dict[0.6]) + 'kgx5'},
+            }
+
+            global_wendler_list = exercise_dict
+
+            return render(request, 'home/wendler.html',
+                          {'form': form, 'number': number, 'calculated_dict': exercise_dict})
+    else:
+        form = WendlerForm()
+
+    return render(request, 'home/wendler.html', {'form': form})
+
+# View to generate PDF of the Wendler plan
 def some_view(request):
-    # Set up styles for PDF
+    # Set up PDF styles and buffer
     styles = getSampleStyleSheet()
     style = styles["BodyText"]
-
-    # Create a buffer to store PDF
     buffer = io.BytesIO()
     canv = canvas.Canvas(buffer)
 
-    # Prepare data for the table
+    # Prepare data for the PDF table
     empty_list = []
     empty_list.append(['Week No.', 'Set 1', "Set 2", "Set 3", "Set 4"])
+    # Add data for each week
     for week in range(1, 5):
         empty_list.append([f'Week {week}'] + list(global_wendler_list[f'Week {week}'].values()))
 
-    print(empty_list)
-
-    # Create header
+    # Create header and table for PDF
     header = Paragraph("<bold><font size=18>Wendler Exercise List</font></bold>", style)
-
-    # Create table
     data = empty_list
     t = Table(data)
+    # Set table styles
     t.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.25, colors.black),
                            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black)]))
-
-    # Set alternating row colors
-    data_len = len(data)
-    for each in range(data_len):
+    # Add alternating row colors
+    for each in range(len(data)):
         bg_color = colors.whitesmoke if each % 2 == 0 else colors.lightgrey
         t.setStyle(TableStyle([('BACKGROUND', (0, each), (-1, each), bg_color)]))
 
-    # Draw header and table on the canvas
+    # Draw header and table on the PDF
     aW, aH = 540, 720
     w, h = header.wrap(aW, aH)
     header.drawOn(canv, 72, 800)
@@ -72,21 +126,19 @@ def some_view(request):
     t.drawOn(canv, 72, aH - h)
     canv.save()
 
-    # Prepare response
+    # Return the PDF as a file response
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='WendlerSheet.pdf')
 
-
-# Function to generate Word document view
+# View to generate Word document of the Wendler plan
 def word_doc_view(request):
     document = Document()
     docx_title = "WendlerSheet.docx"
 
-    # Add content to the document
+    # Add content to the Word document
     document.add_paragraph("Wendler Exercise List")
     for week in range(1, 5):
         document.add_paragraph(f'Week {week}' + str(global_wendler_list[f'Week {week}'])[1:-1])
-
     document.add_page_break()
 
     # Prepare document for download
@@ -102,66 +154,22 @@ def word_doc_view(request):
     response['Content-Length'] = length
     return response
 
-
-# Main view function for Wendler calculator
-def wendler_view(request):
-    if request.method == 'POST':
-        form = WendlerForm(request.POST)
-        if form.is_valid():
-            # Get the one rep max weight from the form
-            number = int(request.POST['weight'])
-            global global_wendler_list
-
-            # Wendler 531 percentage list
-            percentage_list = [0.40, 0.50, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
-
-            # Calculate weights for each percentage
-            calculated_dict = {}
-            for num in percentage_list:
-                calc_num = (number * num - 20) / 2
-                # Round to nearest 2.5 kg
-                if (calc_num % 2.5) < 1.25:
-                    calc_num = calc_num - (calc_num % 2.5)
-                else:
-                    calc_num = calc_num + 2.5 - (calc_num % 2.5)
-                calc_num = max(calc_num, 0)  # Ensure non-negative
-                calculated_dict[num] = calc_num
-
-            # Create exercise dictionary with sets for each week
-            exercise_dict = {
-                'Week 1': {'Set 1': f"{calculated_dict[0.4]}kgx5", 'Set 2': f"{calculated_dict[0.65]}kgx5",
-                           'Set 3': f"{calculated_dict[0.75]}kgx5", 'Set 4': f"{calculated_dict[0.85]}kgx5"},
-                'Week 2': {'Set 1': f"{calculated_dict[0.4]}kgx3", 'Set 2': f"{calculated_dict[0.7]}kgx3",
-                           'Set 3': f"{calculated_dict[0.8]}kgx3", 'Set 4': f"{calculated_dict[0.9]}kgx3"},
-                'Week 3': {'Set 1': f"{calculated_dict[0.4]}kgx5", 'Set 2': f"{calculated_dict[0.75]}kgx5",
-                           'Set 3': f"{calculated_dict[0.85]}kgx3", 'Set 4': f"{calculated_dict[0.95]}kgx1"},
-                'Week 4': {'Set 1': f"{calculated_dict[0.4]}kgx5", 'Set 2': f"{calculated_dict[0.4]}kgx5",
-                           'Set 3': f"{calculated_dict[0.5]}kgx5", 'Set 4': f"{calculated_dict[0.6]}kgx5"},
-            }
-
-            global_wendler_list = exercise_dict
-
-            return render(request, 'wendler.html',
-                          {'form': form, 'number': number, 'calculated_dict': exercise_dict})
-    else:
-        form = WendlerForm()
-
-    return render(request, 'wendler.html', {'form': form})
-
-
-# Function to handle page routing
+# View for handling other pages, requires login
+@login_required(login_url="/login/")
 def pages(request):
     context = {}
     try:
         load_template = request.path.split('/')[-1]
         if load_template == 'admin':
-            return HttpResponseRedirect(reverse('admin:wendler'))
+            return HttpResponseRedirect(reverse('admin:index'))
         context['segment'] = load_template
         html_template = loader.get_template('home/' + load_template)
         return HttpResponse(html_template.render(context, request))
     except template.TemplateDoesNotExist:
+        # Handle 404 error
         html_template = loader.get_template('home/page-404.html')
         return HttpResponse(html_template.render(context, request))
     except:
+        # Handle 500 error
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
