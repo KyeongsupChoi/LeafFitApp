@@ -5,6 +5,7 @@ from django.urls import path, re_path
 from apps.home import views
 
 urlpatterns = [
+    #path('plot/', views.plot_csv, name='plot_csv'),
 
     # The home page
     path('', views.index, name='home'),
@@ -14,6 +15,8 @@ urlpatterns = [
     path('export/', views.some_view, name='exporty'),
 
     path('export_doc/', views.word_doc_view, name='exportie'),
+
+
 
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),

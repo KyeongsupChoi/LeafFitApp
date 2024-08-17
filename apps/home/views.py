@@ -32,6 +32,16 @@ def index(request):
     html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
 
+
+import csv
+from django.shortcuts import render
+import plotly.graph_objs as go
+from plotly.offline import plot
+
+
+# def plot_csv(request):
+
+
 # View for the Wendler 5/3/1 calculator
 def wendler_view(request):
     if request.method == 'POST':
@@ -157,6 +167,37 @@ def word_doc_view(request):
 # View for handling other pages, requires login
 @login_required(login_url="/login/")
 def pages(request):
+
+    if request.path == "/transactions.html":
+        # Read CSV data
+        csv_data = []
+        with open('apps/dataset/benchpress.csv', 'r') as file:
+            csv_reader = csv.DictReader(file)
+            for row in csv_reader:
+                csv_data.append(row)
+
+        # Prepare data for Plotly
+        age = [int(row['Age']) for row in csv_data]
+        categories = ['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite']
+
+        traces = []
+        for category in categories:
+            y = [int(row[category]) for row in csv_data]
+            trace = go.Scatter(x=age, y=y, mode='lines+markers', name=category)
+            traces.append(trace)
+
+        # Create the Plotly figure
+        layout = go.Layout(title='Performance by Age and Skill Level',
+                           xaxis=dict(title='Age'),
+                           yaxis=dict(title='Score'))
+        fig = go.Figure(data=traces, layout=layout)
+
+        # Convert the figure to HTML
+        plot_div = plot(fig, output_type='div', include_plotlyjs=True)
+
+        print("woof")
+
+        return render(request, 'home/transactions.html', context={'plot_div': plot_div})
     context = {}
     try:
         load_template = request.path.split('/')[-1]
