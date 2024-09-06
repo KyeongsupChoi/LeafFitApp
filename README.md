@@ -1,56 +1,15 @@
 
+## 🏋 Leaffit
 
-<br />
+> Generate Wendler Exercise Sheets based on your One Rep Max weights  
+> 
+> Visit the live site here https://kyeongsupchoi.pythonanywhere.com
+> 
+> Wendler Program explanation at https://www.t-nation.com/workouts/5-3-1-how-to-build-pure-strength/
 
-> Features
+## 📂 Code-base structure
 
-- Up-to-date [dependencies](./requirements.txt): **Django 3.2.6 LTS**
-- [SCSS compilation](#recompile-css) via **Gulp**
-- UI-Ready app, SQLite Database, Django Native ORM
-- Modular design, clean code-base
-- Session-Based Authentication, Forms validation
-- Deployment scripts: Docker, Gunicorn / Nginx
-- Support via **Github** and [Discord](https://discord.gg/fZC6hup).
-
-
-## How to use it
-
-```bash
-$ # Get the code
-$ git clone https://github.com/app-generator/django-dashboard-volt.git
-$ cd django-dashboard-volt
-$
-$ # Virtualenv modules installation (Unix based systems)
-$ virtualenv env
-$ source env/bin/activate
-$
-$ # Virtualenv modules installation (Windows based systems)
-$ # virtualenv env
-$ # .\env\Scripts\activate
-$
-$ # Install modules - SQLite Storage
-$ pip3 install -r requirements.txt
-$
-$ # Create tables
-$ python manage.py makemigrations
-$ python manage.py migrate
-$
-$ # Start the application (development mode)
-$ python manage.py runserver # default port 8000
-$
-$ # Start the app - custom port
-$ # python manage.py runserver 0.0.0.0:<your_port>
-$
-$ # Access the web app in browser: http://127.0.0.1:8000/
-```
-
-> Note: To use the app, please access the registration page and create a new user. After authentication, the app will unlock the private pages.
-
-<br />
-
-## Code-base structure
-
-The project is coded using a simple and intuitive structure presented bellow:
+The project is coded using a simple and intuitive structure presented below:
 
 ```bash
 < PROJECT ROOT >
@@ -104,117 +63,27 @@ The project is coded using a simple and intuitive structure presented bellow:
 
 <br />
 
-> The bootstrap flow
+## 📚 Libraries Used
 
-- Django bootstrapper `manage.py` uses `core/settings.py` as the main configuration file
-- `core/settings.py` loads the app magic from `.env` file
-- Redirect the guest users to Login page
-- Unlock the pages served by *app* node for authenticated users
+- ✅ `Django` - Basic Web Framework and MVT design pattern
+- ✅ `ReportLab` - Exporting in PDF format
+- ✅ `Docx` Exporting in DOCX format for Word and Google Docs
 
-<br />
+## 🏋 리프핏
 
-## Recompile CSS
-
-To recompile SCSS files, follow this setup:
-
-<br />
-
-**Step #1** - Install tools
-
-- [NodeJS](https://nodejs.org/en/) 12.x or higher
-- [Gulp](https://gulpjs.com/) - globally 
-    - `npm install -g gulp-cli`
-- [Yarn](https://yarnpkg.com/) (optional) 
-
-<br />
-
-**Step #2** - Change the working directory to `assets` folder
-
-```bash
-$ cd apps/static/assets
-```
-
-<br />
-
-**Step #3** - Install modules (this will create a classic `node_modules` directory)
-
-```bash
-$ npm install
-// OR
-$ yarn
-```
-
-<br />
-
-**Step #4** - Edit & Recompile SCSS files 
-
-```bash
-$ gulp scss
-```
-
-The generated file is saved in `static/assets/css` directory.
-
-<br />
-
-## Deployment
-
-The app is provided with a basic configuration to be executed in [Docker](https://www.docker.com/), [Gunicorn](https://gunicorn.org/), and [Waitress](https://docs.pylonsproject.org/projects/waitress/en/stable/).
-
-### [Docker](https://www.docker.com/) execution
----
-
-The application can be easily executed in a docker container. The steps:
-
-
-> Start the app in Docker
-
-```bash
-$ sudo docker-compose pull && sudo docker-compose build && sudo docker-compose up -d
-```
-
-Visit `http://localhost:85` in your browser. The app should be up & running.
-
-<br />
-
-### [Gunicorn](https://gunicorn.org/)
----
-
-Gunicorn 'Green Unicorn' is a Python WSGI HTTP Server for UNIX.
-
-> Install using pip
-
-```bash
-$ pip install gunicorn
-```
-> Start the app using gunicorn binary
-
-```bash
-$ gunicorn --bind=0.0.0.0:8001 core.wsgi:application
-Serving on http://localhost:8001
-```
-
-Visit `http://localhost:8001` in your browser. The app should be up & running.
+> One Rep Max 무게를 기반으로 Wendler 운동 시트 생성 웹앱
+>
+> 라이브 사이트 https://kyeongsupchoi.pythonanywhere.com
+>
+> Wendler 운동 프로그램 설명: https://www.t-nation.com/workouts/5-3-1-how-to-build-pure-strength/
 
 
 <br />
 
-### [Waitress](https://docs.pylonsproject.org/projects/waitress/en/stable/)
----
+## 📚 사용된 라이브러리
 
-Waitress (Gunicorn equivalent for Windows) is meant to be a production-quality pure-Python WSGI server with very acceptable performance. It has no dependencies except ones that live in the Python standard library.
-
-> Install using pip
-
-```bash
-$ pip install waitress
-```
-> Start the app using [waitress-serve](https://docs.pylonsproject.org/projects/waitress/en/stable/runner.html)
-
-```bash
-$ waitress-serve --port=8001 core.wsgi:application
-Serving on http://localhost:8001
-```
-
-Visit `http://localhost:8001` in your browser. The app should be up & running.
+- ✅ `Django` - 기본 웹 프레임워크 및 MVT 디자인 패턴
+- ✅ `ReportLab` - PDF 형식으로 다운로드
+- ✅ `Docx` Word 및 Google 문서용 DOCX 형식으로 다운로드
 
 <br />
