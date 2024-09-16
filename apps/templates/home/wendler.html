@@ -24,16 +24,7 @@
           <h2 class="h4">Wendler Program</h2>
           <p class="mb-0">Create a custom Stronglifting Program based on your 1 Rep Max</p>
       </div>
-      <div class="btn-toolbar mb-2 mb-md-0">
-          <div class="btn-group ms-2 ms-lg-3">
-              <form action="export/">
-                  <input type="submit" value="PDF" class="btn btn-sm btn-outline-gray-600"/>
-              </form>
-              <form action="export_doc/">
-                  <input type="submit" value="Word/Docx" class="btn btn-sm btn-outline-gray-600"/>
-              </form>
-          </div>
-      </div>
+
   </div>
 
 <!--search and setttings
@@ -103,7 +94,18 @@
                   </tbody>
               </table>
               <br>
+              <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group ms-2 ms-lg-3">
+              <form action="export_pdf/">
+                  <input type="submit" value="PDF" class="btn btn-sm btn-outline-gray-600"/>
+              </form>
+              <form action="export_docx/">
+                  <input type="submit" value="Word/Docx" class="btn btn-sm btn-outline-gray-600"/>
+              </form>
           </div>
+      </div>
+          </div>
+
       </table>
                     <!-- pagination
       <div class="card-footer px-3 border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between">

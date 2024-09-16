@@ -12,9 +12,9 @@ urlpatterns = [
 
     path('wendler.html', views.wendler_view, name='wendler'),
 
-    path('export/', views.some_view, name='exporty'),
+    path('export_pdf/', views.some_view, name='exporty'),
 
-    path('export_doc/', views.word_doc_view, name='exportie'),
+    path('export_docx/', views.word_doc_view, name='exportie'),
 
 
 
