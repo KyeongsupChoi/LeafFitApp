@@ -144,7 +144,6 @@ def some_view(request):
 def word_doc_view(request):
     document = Document()
     docx_title = "WendlerSheet.docx"
-
     # Add content to the Word document
     document.add_paragraph("Wendler Exercise List")
     for week in range(1, 5):

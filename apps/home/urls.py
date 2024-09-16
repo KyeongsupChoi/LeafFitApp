@@ -12,11 +12,9 @@ urlpatterns = [
 
     path('wendler.html', views.wendler_view, name='wendler'),
 
-    path('export_pdf/', views.some_view, name='exporty'),
+    path('export/', views.some_view, name='exporty'),
 
     path('export_docx/', views.word_doc_view, name='exportie'),
-
-
 
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
