@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 # Import necessary modules from Django and other libraries
+import os
+
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
@@ -25,6 +27,7 @@ from .forms import WendlerForm
 from .models import WendlerPlan
 from reportlab.pdfgen import canvas
 import io
+from django.conf import settings
 
 # View for the dashboard page, requires login
 @login_required(login_url="/login/")
@@ -50,6 +53,7 @@ def wendler_view(request):
         if form.is_valid():
             # Get the one rep max weight from the form
             number = int(request.POST['weight'])
+            global global_wendler_list
 
             # List of percentages for the Wendler 5/3/1 program
             percentage_list = [0.40, 0.50, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
@@ -180,7 +184,8 @@ def pages(request):
     if request.path == "/transactions.html":
         # Read CSV data
         csv_data = []
-        with open('apps/dataset/benchpress.csv', 'r') as file:
+        file_path = os.path.join(settings.DATA_DIR, 'apps', 'dataset', 'benchpress.csv')
+        with open(file_path, 'r') as file:
             csv_reader = csv.DictReader(file)
             for row in csv_reader:
                 csv_data.append(row)
