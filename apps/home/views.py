@@ -22,6 +22,7 @@ from docx.shared import Inches
 
 # Import custom form
 from .forms import WendlerForm
+from .models import WendlerPlan
 from reportlab.pdfgen import canvas
 import io
 
@@ -49,7 +50,6 @@ def wendler_view(request):
         if form.is_valid():
             # Get the one rep max weight from the form
             number = int(request.POST['weight'])
-            global global_wendler_list
 
             # List of percentages for the Wendler 5/3/1 program
             percentage_list = [0.40, 0.50, 0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95]
@@ -91,7 +91,17 @@ def wendler_view(request):
                            'Set 4': str(calculated_dict[0.6]) + 'kgx5'},
             }
 
-            global_wendler_list = exercise_dict
+            # Save the plan to the database
+            plan = WendlerPlan.objects.create(
+                user=request.user,
+                name=form.cleaned_data.get('name', 'Default Wendler Plan'),
+                weight=number
+            )
+            # You can create a related model to store `exercise_dict` if needed
+            # For simplicity, let's assume you serialize it as JSON
+            import json
+            plan.exercise_data = json.dumps(exercise_dict)
+            plan.save()
 
             return render(request, 'home/wendler.html',
                           {'form': form, 'number': number, 'calculated_dict': exercise_dict})
