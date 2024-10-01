@@ -95,6 +95,8 @@ def wendler_view(request):
                            'Set 4': str(calculated_dict[0.6]) + 'kgx5'},
             }
 
+            global_wendler_list = exercise_dict
+
             # Save the plan to the database
             plan = WendlerPlan.objects.create(
                 user=request.user,
