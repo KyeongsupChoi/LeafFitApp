@@ -29,6 +29,8 @@ from reportlab.pdfgen import canvas
 import io
 from django.conf import settings
 
+from .models import WendlerPlan
+
 # View for the dashboard page, requires login
 @login_required(login_url="/login/")
 def index(request):
@@ -155,6 +157,11 @@ def some_view(request):
     # Return the PDF as a file response
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='WendlerSheet.pdf')
+
+def wendler_plan_list(request):
+    wendler_plans = WendlerPlan.objects.all()  # Retrieve all WendlerPlan objects
+    print("farr")
+    return render(request, 'home/settings.html', {'wendler_plans': wendler_plans})
 
 # View to generate Word document of the Wendler plan
 def word_doc_view(request):

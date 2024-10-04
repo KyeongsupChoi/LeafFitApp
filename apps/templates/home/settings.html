@@ -72,9 +72,22 @@
     <div class="row">
         <div class="col-12 col-xl-8">
             <div class="card card-body border-0 shadow mb-4">
-                <h2 class="h5 mb-4">BMI Protein</h2>
-                <p>Insert weight and height, get bmi and recommended protein</p>
-                <p>Visualization against average</p>
+                <h1>Wendler Plans</h1>
+                    <ul>
+                        {% for plan in wendler_plans %}
+                            <li>
+                                <strong>{{ plan.name }}</strong> - {{ plan.weight }} kg
+                                <br>
+                                Created at: {{ plan.created_at }}
+                                <br>
+                                Updated at: {{ plan.updated_at }}
+                                <br>
+                                Exercise Data: {{ plan.exercise_data }}
+                            </li>
+                        {% empty %}
+                            <li>No Wendler plans available.</li>
+                        {% endfor %}
+                    </ul>
                 <form>
                     <div class="row">
                         <div class="col-md-6 mb-3">

@@ -16,6 +16,8 @@ urlpatterns = [
 
     path('export_docx/', views.word_doc_view, name='exportie'),
 
+    path('wendler-plans/', views.wendler_plan_list, name='wendler_plan_list'),
+
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 
