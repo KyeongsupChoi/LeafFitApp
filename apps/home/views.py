@@ -2,6 +2,7 @@
 
 # Import necessary modules from Django and other libraries
 import os
+import json
 
 from django import template
 from django.contrib.auth.decorators import login_required
@@ -166,7 +167,12 @@ def some_view(request):
 
 def wendler_plan_list(request):
     wendler_plans = WendlerPlan.objects.filter(user=request.user)
-    print("farr")
+    for plan in wendler_plans:
+        if isinstance(plan.exercise_data, str):  # Check if it's a string
+            try:
+                plan.exercise_data = json.loads(plan.exercise_data)  # Parse JSON string
+            except json.JSONDecodeError:
+                plan.exercise_data = {}  # Set to empty dict if JSON is invalid
     return render(request, 'home/settings.html', {'wendler_plans': wendler_plans})
 
 
