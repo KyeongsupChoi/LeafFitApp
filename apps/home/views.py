@@ -159,7 +159,7 @@ def some_view(request):
     return FileResponse(buffer, as_attachment=True, filename='WendlerSheet.pdf')
 
 def wendler_plan_list(request):
-    wendler_plans = WendlerPlan.objects.all()  # Retrieve all WendlerPlan objects
+    wendler_plans = WendlerPlan.objects.filter(user=request.user)
     print("farr")
     return render(request, 'home/settings.html', {'wendler_plans': wendler_plans})
 
