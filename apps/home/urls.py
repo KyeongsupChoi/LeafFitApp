@@ -18,6 +18,10 @@ urlpatterns = [
 
     path('wendler-plans/', views.wendler_plan_list, name='wendler_plan_list'),
 
+    path('wendler-plans/update/<int:plan_id>/', views.update_wendler_plan, name='update_wendler_plan'),
+
+    path('wendler-plans/delete/<int:plan_id>/', views.delete_wendler_plan, name='delete_wendler_plan'),
+
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

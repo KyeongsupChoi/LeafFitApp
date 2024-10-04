@@ -2,6 +2,7 @@
 
 from django import forms
 from .models import RepMax
+from .models import WendlerPlan
 
 
 class WendlerForm(forms.ModelForm):
@@ -14,3 +15,8 @@ class WendlerForm(forms.ModelForm):
         model = RepMax
 
 
+
+class WendlerPlanForm(forms.ModelForm):
+    class Meta:
+        model = WendlerPlan
+        fields = ['weight', 'exercise_data']

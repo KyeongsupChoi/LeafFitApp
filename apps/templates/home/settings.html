@@ -23,26 +23,28 @@
       </div>
     </div>
 
-    <div class="card card-body border-0 shadow table-wrapper table-responsive">
-                <h1>1RPM Records</h1>
-                    <ul>
-                        {% for plan in wendler_plans %}
-                            <li>
-                                <strong>{{ plan.name }}</strong> - {{ plan.weight }} kg
-                                <br>
-                                Created by: {{ plan.user }}
-                                <br>
-                                Created at: {{ plan.created_at }}
-                                <br>
-                                Updated at: {{ plan.updated_at }}
-                                <br>
-                                Exercise Data: {{ plan.exercise_data }}
-                            </li>
-                        {% empty %}
-                            <li>No Wendler plans available.</li>
-                        {% endfor %}
-                    </ul>
-            </div>
+   <div class="card card-body border-0 shadow table-wrapper table-responsive">
+  <h1>1RPM Records</h1>
+  <ul>
+    {% for plan in wendler_plans %}
+    <li>
+      <strong>{{ plan.name }}</strong> - {{ plan.weight }} kg
+      <br> Created by: {{ plan.user }}
+      <br> Created at: {{ plan.created_at }}
+      <br> Updated at: {{ plan.updated_at }}
+      <br> Exercise Data: {{ plan.exercise_data }}
+      <br>
+      <!-- Add Update Button -->
+      <a href="{% url 'update_wendler_plan' plan.id %}" class="btn btn-primary btn-sm mt-2">Update</a>
+        <a href="{% url 'delete_wendler_plan' plan.id %}" class="btn btn-danger btn-sm mt-2"
+         onclick="return confirm('Are you sure you want to delete this plan?');">Delete</a>
+    </li>
+    {% empty %}
+    <li>No Wendler plans available.</li>
+    {% endfor %}
+  </ul>
+</div>
+
 
 
 {% endblock content %}

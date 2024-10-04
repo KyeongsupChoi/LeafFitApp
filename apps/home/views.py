@@ -11,6 +11,10 @@ from django.template import loader
 from django.urls import reverse
 from docx import settings
 
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import WendlerPlan
+from .forms import WendlerPlanForm
+
 # Import PDF generation libraries
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
@@ -29,7 +33,9 @@ from reportlab.pdfgen import canvas
 import io
 from django.conf import settings
 
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import WendlerPlan
+from .forms import WendlerPlanForm
 
 # View for the dashboard page, requires login
 @login_required(login_url="/login/")
@@ -162,6 +168,28 @@ def wendler_plan_list(request):
     wendler_plans = WendlerPlan.objects.filter(user=request.user)
     print("farr")
     return render(request, 'home/settings.html', {'wendler_plans': wendler_plans})
+
+
+
+def update_wendler_plan(request, plan_id):
+    plan = get_object_or_404(WendlerPlan, id=plan_id, user=request.user)
+
+    if request.method == 'POST':
+        form = WendlerPlanForm(request.POST, instance=plan)
+        if form.is_valid():
+            form.save()
+            return redirect('wendler_plan_list')  # Redirect to the list of Wendler plans
+    else:
+        form = WendlerPlanForm(instance=plan)  # Pre-fill the form with the current data
+
+    return render(request, 'home/update_wendler_plan.html', {'form': form, 'plan': plan})
+
+def delete_wendler_plan(request, plan_id):
+    plan = get_object_or_404(WendlerPlan, id=plan_id, user=request.user)  # Ensure the user owns the plan
+    if request.method == 'POST':
+        plan.delete()  # Delete the WendlerPlan object
+        return redirect('wendler_plan_list')  # Redirect to the list view
+    return render(request, 'home/confirm_delete.html', {'plan': plan})
 
 # View to generate Word document of the Wendler plan
 def word_doc_view(request):
