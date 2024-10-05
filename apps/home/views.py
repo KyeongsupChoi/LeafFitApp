@@ -231,25 +231,39 @@ def pages(request):
         # Read CSV data
         csv_data = []
         file_path = os.path.join(settings.DATA_DIR, 'apps', 'dataset', 'benchpress.csv')
-        with open(file_path, 'r') as file:
-            csv_reader = csv.DictReader(file)
-            for row in csv_reader:
-                csv_data.append(row)
+        try:
+            with open(file_path, 'r') as file:
+                csv_reader = csv.DictReader(file)
+                for row in csv_reader:
+                    csv_data.append(row)
+        except FileNotFoundError:
+            return render(request, 'home/transactions.html', context={'error': 'Data file not found'})
 
         # Prepare data for Plotly
-        age = [int(row['Age']) for row in csv_data]
+        age = [int(row['Age']) for row in csv_data]  # Extract ages
         categories = ['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite']
 
         traces = []
         for category in categories:
             y = [int(row[category]) for row in csv_data]
-            trace = go.Scatter(x=age, y=y, mode='lines+markers', name=category)
+            trace = go.Bar(
+                x=age,
+                y=y,
+                name=category,
+
+                text=[f'{category} ({row["Age"]})' for row in csv_data],
+                hoverinfo='x+y+name',  # Shows Age, Weight, and Category on hover
+                hovertemplate='<b>Age:</b> %{x}<br><b>Weight:</b> %{y} kg<br><b>Category:</b> %{name}<extra></extra>',
+            )
             traces.append(trace)
 
-        # Create the Plotly figure
-        layout = go.Layout(title='Performance by Age and Skill Level',
-                           xaxis=dict(title='Age'),
-                           yaxis=dict(title='Weight'))
+        # Create the figure
+        layout = go.Layout(
+            title='Performance by Age and Skill Level',
+            xaxis=dict(title='Age'),
+            yaxis=dict(title='Weight (kg)'),
+            barmode='group',  # Group bars for comparison
+        )
         fig = go.Figure(data=traces, layout=layout)
 
         # Convert the figure to HTML
