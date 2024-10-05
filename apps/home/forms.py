@@ -19,4 +19,4 @@ class WendlerForm(forms.ModelForm):
 class WendlerPlanForm(forms.ModelForm):
     class Meta:
         model = WendlerPlan
-        fields = ['weight', 'exercise_data']
+        fields = ['name', 'weight', 'exercise_data']

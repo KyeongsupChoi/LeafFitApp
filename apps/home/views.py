@@ -11,6 +11,7 @@ from django.shortcuts import render
 from django.template import loader
 from django.urls import reverse
 from docx import settings
+from django.utils import timezone
 
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import WendlerPlan
@@ -183,7 +184,9 @@ def update_wendler_plan(request, plan_id):
     if request.method == 'POST':
         form = WendlerPlanForm(request.POST, instance=plan)
         if form.is_valid():
-            form.save()
+            updated_plan = form.save(commit=False)  # Save the form but don't commit yet
+            updated_plan.updated_at = timezone.now()  # Set updated_at to current time
+            updated_plan.save()  # Now save the instance
             return redirect('wendler_plan_list')  # Redirect to the list of Wendler plans
     else:
         form = WendlerPlanForm(instance=plan)  # Pre-fill the form with the current data
@@ -246,13 +249,12 @@ def pages(request):
         # Create the Plotly figure
         layout = go.Layout(title='Performance by Age and Skill Level',
                            xaxis=dict(title='Age'),
-                           yaxis=dict(title='Score'))
+                           yaxis=dict(title='Weight'))
         fig = go.Figure(data=traces, layout=layout)
 
         # Convert the figure to HTML
         plot_div = plot(fig, output_type='div', include_plotlyjs=True)
 
-        print("woof")
 
         return render(request, 'home/transactions.html', context={'plot_div': plot_div})
     context = {}
