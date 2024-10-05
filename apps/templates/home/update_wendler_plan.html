@@ -3,13 +3,15 @@
 {% block title %} Update Wendler Plan {% endblock %}
 
 {% block content %}
+<div class="card card-body border-0 shadow table-wrapper table-responsive">
 <div class="container">
   <h1>Update Wendler Plan</h1>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save Changes</button>
+    <button type="submit" class="btn btn-success">Save Changes</button> <a href="{% url 'wendler_plan_list' %}" class="btn btn-secondary">Back to Plans</a>
   </form>
-  <a href="{% url 'wendler_plan_list' %}" class="btn btn-secondary">Back to Plans</a>
+
+</div>
 </div>
 {% endblock content %}
