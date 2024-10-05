@@ -39,22 +39,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import WendlerPlan
 from .forms import WendlerPlanForm
 
+import csv
+from django.shortcuts import render
+import plotly.graph_objs as go
+from plotly.offline import plot
+
 # View for the dashboard page, requires login
 @login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
     html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
-
-
-import csv
-from django.shortcuts import render
-import plotly.graph_objs as go
-from plotly.offline import plot
-
-
-# def plot_csv(request):
-
 
 # View for the Wendler 5/3/1 calculator
 def wendler_view(request):
