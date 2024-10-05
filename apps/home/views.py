@@ -226,51 +226,66 @@ def word_doc_view(request):
 # View for handling other pages, requires login
 @login_required(login_url="/login/")
 def pages(request):
+    # List of CSV files
+    csv_files = [
+        'benchpress.csv',
+        'age_skill_levels_deadlift.csv',
+        'age_skill_levels_overheadpress.csv',
+        'age_skill_levels_squat.csv'
+    ]
 
-    if request.path == "/transactions.html":
-        # Read CSV data
-        csv_data = []
-        file_path = os.path.join(settings.DATA_DIR, 'apps', 'dataset', 'benchpress.csv')
+    plot_divs = []  # This will hold all the plotly divs
+    file_errors = []  # To keep track of any missing files
+
+    # Prepare data for each CSV file
+    for file_name in csv_files:
+        file_path = os.path.join(settings.DATA_DIR, 'apps', 'dataset', file_name)
         try:
             with open(file_path, 'r') as file:
                 csv_reader = csv.DictReader(file)
-                for row in csv_reader:
-                    csv_data.append(row)
+                csv_data = list(csv_reader)  # Read the data into a list
+
+                # Prepare data for Plotly
+                age = [int(row['Age']) for row in csv_data]  # Extract ages
+                categories = ['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite']
+
+                traces = []
+                for category in categories:
+                    y = [int(row[category]) for row in csv_data if category in row]
+                    trace = go.Bar(
+                        x=age,
+                        y=y,
+                        name=f'{file_name[:-4]} - {category}',  # Name includes the type of lift
+                        text=[f'{category} ({row["Age"]})' for row in csv_data],
+                        hoverinfo='x+y+name',  # Shows Age, Weight, and Category on hover
+                        hovertemplate='<b>Age:</b> %{x}<br><b>Weight:</b> %{y} kg<br><b>Category:</b> %{name}<extra></extra>',
+                    )
+                    traces.append(trace)
+
+                # Create the figure for this specific lift
+                layout = go.Layout(
+                    title=f'Performance by Age and Skill Level for {file_name[:-4]}',
+                    xaxis=dict(title='Age'),
+                    yaxis=dict(title='Weight (kg)'),
+                    barmode='group',  # Group bars for comparison
+                )
+                fig = go.Figure(data=traces, layout=layout)
+
+                # Convert the figure to HTML and add to plot_divs
+                plot_div = plot(fig, output_type='div', include_plotlyjs=True)
+                plot_divs.append(plot_div)
+
         except FileNotFoundError:
-            return render(request, 'home/transactions.html', context={'error': 'Data file not found'})
+            file_errors.append(f'Data file not found: {file_name}')
 
-        # Prepare data for Plotly
-        age = [int(row['Age']) for row in csv_data]  # Extract ages
-        categories = ['Beginner', 'Novice', 'Intermediate', 'Advanced', 'Elite']
+    # Context with multiple plot divs
+    context = {
+        'plot_divs': plot_divs,
+        'file_errors': file_errors if file_errors else None
+    }
 
-        traces = []
-        for category in categories:
-            y = [int(row[category]) for row in csv_data]
-            trace = go.Bar(
-                x=age,
-                y=y,
-                name=category,
+    return render(request, 'home/transactions.html', context=context)
 
-                text=[f'{category} ({row["Age"]})' for row in csv_data],
-                hoverinfo='x+y+name',  # Shows Age, Weight, and Category on hover
-                hovertemplate='<b>Age:</b> %{x}<br><b>Weight:</b> %{y} kg<br><b>Category:</b> %{name}<extra></extra>',
-            )
-            traces.append(trace)
-
-        # Create the figure
-        layout = go.Layout(
-            title='Performance by Age and Skill Level',
-            xaxis=dict(title='Age'),
-            yaxis=dict(title='Weight (kg)'),
-            barmode='group',  # Group bars for comparison
-        )
-        fig = go.Figure(data=traces, layout=layout)
-
-        # Convert the figure to HTML
-        plot_div = plot(fig, output_type='div', include_plotlyjs=True)
-
-
-        return render(request, 'home/transactions.html', context={'plot_div': plot_div})
     context = {}
     try:
         load_template = request.path.split('/')[-1]
