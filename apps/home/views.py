@@ -7,15 +7,11 @@ import json
 from django import template
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
-from django.shortcuts import render
 from django.template import loader
 from django.urls import reverse
 from docx import settings
 from django.utils import timezone
 
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import WendlerPlan
-from .forms import WendlerPlanForm
 
 # Import PDF generation libraries
 from reportlab.lib import colors
@@ -30,7 +26,6 @@ from docx.shared import Inches
 
 # Import custom form
 from .forms import WendlerForm
-from .models import WendlerPlan
 from reportlab.pdfgen import canvas
 import io
 from django.conf import settings
@@ -40,7 +35,6 @@ from .models import WendlerPlan
 from .forms import WendlerPlanForm
 
 import csv
-from django.shortcuts import render
 import plotly.graph_objs as go
 from plotly.offline import plot
 
