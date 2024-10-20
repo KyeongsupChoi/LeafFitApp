@@ -229,7 +229,7 @@ def pages(request):
         'file_errors': file_errors,
     }
 
-    return render(request, 'home/index.html', context)
+    return render(request, 'home/transactions.html', context)
 
 
 # View for a specific page
